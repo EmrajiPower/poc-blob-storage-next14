@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"; 
+import { list } from '@vercel/blob';
 import { put } from "@vercel/blob";
 
 export async function POST(req) {
@@ -12,4 +13,9 @@ export async function POST(req) {
         access: "public",
     })
     return Response.json(blob);
+}
+
+export async function GET() {
+    const { blobs } = await list();
+    return Response.json({ blobs });
 }
