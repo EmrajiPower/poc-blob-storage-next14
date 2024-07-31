@@ -1,20 +1,27 @@
 "use client"
+import { useState, useRef } from 'react';
 import packageJson from '../package.json'
-import { useForm } from "react-hook-form"
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from '@/components/ui/form';
 
 export default function Home() {
-  const form = useForm()
+
+  // const form = useForm()
+  const inputFileRef = useRef(null);
+  const [file,setFile] = useState(null)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!inputFileRef.current?.files) {
+      throw new Error("No file selected");
+    }
+
+    const file = inputFileRef.current.files[0];
+    const response = await fetch(`/api/file?filename=${file.name}`, {
+      method: "POST", 
+      body: file,
+    });
+    console.log("Ver ... ",response.json())
+  }
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className='flex flex-row justify-around items-center m-auto w-[80vw] h-[80vh]'>
@@ -23,27 +30,11 @@ export default function Home() {
             POC Blob storage v{packageJson.version}
           </div>
           <div>
-            <Form {...form}>
-              <form className="space-y-8">
-                <FormField
-                  control={form.control}
-                  name="username"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>File</FormLabel>
-                      <FormControl>
-                        <Input type="file" placeholder="shadcn" {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        This is your public display name.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit">Submit</Button>
+              <form onSubmit={(e)=>handleSubmit(e)} className="space-y-8">
+                <input name="file" ref={inputFileRef} type="file" required />
+                <br></br>
+                <button type="submit" className='bg-white rounded-2xl p-1'>Upload</button>
               </form>
-            </Form>
           </div>
         </section>
         <section>
