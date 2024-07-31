@@ -12,11 +12,21 @@ import {
 export default function TableComponent() {
 
     const [file, setFile] = useState(null)
+    const [loading, setLoading] = useState(true)
 
     const getBlobs = async () => {
-        const response = await fetch('/api/file');
-        const data = await response.json();
-        setFile(data.blobs)
+        setLoading(true)
+        try {
+            const response = await fetch('/api/file');
+            const data = await response.json();
+            if(data){
+                setFile(data.blobs)
+            }
+        } catch (error) {
+            console.log("Tenemos :: ",error)
+            setFile([])
+        }
+        setLoading(false)
     }
 
     useEffect(() => {
@@ -25,9 +35,24 @@ export default function TableComponent() {
 
     return (
         <>
-            {file ?
-                <Table className="bg-white rounded-xl h-[50vh]">
-                    <TableCaption>List of recent submitted files</TableCaption>
+            {/* Loading state */}
+            {loading&&
+                <div className="bg-gray-200 animate-pulse rounded-xl h-[50vh] w-[40vw]">
+                    <div className="w-full flex">
+                        <div className="w-[100px] h-6"></div>
+                        <div className="w-full h-6"></div>
+                        <div className="w-full text-right h-6"></div>
+                    </div>
+                    <div className="w-full flex">
+                        <div className="w-[100px] h-6"></div>
+                        <div className="w-full h-6"></div>
+                        <div className="w-full text-right h-6"></div>
+                    </div>
+              </div>
+            }
+            {/* Fetched data */}
+            {file !== null && file.length !== 0 &&
+                <Table className="bg-white rounded-xl h-[50vh] w-[35vw]">
                     <TableHeader>
                         <TableRow>
                             <TableHead className="w-[100px]">Name</TableHead>
@@ -44,8 +69,23 @@ export default function TableComponent() {
                             </TableRow>
                         })}
                     </TableBody>
-                </Table> :
-                <p>Loading ...</p>}
+                </Table>}
+            {/* Empty state */}
+              {file && file.length == 0 && <div className="relative">
+            <Table className=" bg-white rounded-xl h-[50vh] w-[30vw]">
+                <TableCaption>List of recent submitted files</TableCaption>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead className="w-[100px]">Name</TableHead>
+                        <TableHead>size</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                </TableHeader>
+            </Table>
+            <div className="absolute text-nowrap left-2/4 -translate-x-1/2 translate-y-1/2">
+            ⬅️ Start uploading files
+            </div>
+        </div>}
         </>
 
     )

@@ -26,9 +26,10 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className='flex flex-row justify-around items-center m-auto w-[80vw] h-[80vh]'>
         <section>
-          <div>
+          <h3 className='font-bold'>
             POC Blob storage v{packageJson.version}
-          </div>
+          </h3>
+          <br></br>
           <div>
             <form onSubmit={(e) => handleSubmit(e)} className="space-y-8">
               <input name="file" ref={inputFileRef} type="file" required />
