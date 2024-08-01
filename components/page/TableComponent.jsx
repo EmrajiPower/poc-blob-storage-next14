@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
     TableHead,
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { DownloadIcon } from '@/components/utils/icons';
+import { bytesToMegabytes } from "../utils/math";
 
 export default function TableComponent() {
 
@@ -60,12 +61,12 @@ export default function TableComponent() {
                             <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
-                    <TableBody>
+                    <TableBody className="h-[20vh] max-h-[30vh] overflow-y-auto overflow-x-auto">
                         {file && file.map(({downloadUrl,pathname,size},i) => {
                             return <TableRow key={i}>
                                 <TableCell className="font-medium">{pathname}</TableCell>
-                                <TableCell>{size}kb</TableCell>
-                                <TableCell className="text-right"><a href={`${downloadUrl}`}>Link</a></TableCell>
+                                <TableCell>{bytesToMegabytes(size)}</TableCell>
+                                <TableCell className="text-right"><a href={`${downloadUrl}`}><DownloadIcon/></a></TableCell>
                             </TableRow>
                         })}
                     </TableBody>
