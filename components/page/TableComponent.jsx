@@ -71,18 +71,17 @@ export default function TableComponent() {
                     </TableBody>
                 </Table>}
             {/* Empty state */}
-              {file && file.length == 0 && <div className="relative">
-            <Table className=" bg-white rounded-xl h-[50vh] w-[30vw]">
-                <TableCaption>List of recent submitted files</TableCaption>
+              {file && file.length == 0 && <div className="relative flex">
+            <Table className=" bg-white rounded-xl h-[5vh] w-[30vw]">
                 <TableHeader>
-                    <TableRow>
+                    <TableRow className="h-[20px]">
                         <TableHead className="w-[100px]">Name</TableHead>
                         <TableHead>size</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                 </TableHeader>
             </Table>
-            <div className="absolute text-nowrap left-2/4 -translate-x-1/2 translate-y-1/2">
+            <div className="absolute pt-4 w-[30vw] h-[10vh] m-auto text-center bg-white text-nowrap left-2/4 -translate-x-1/2 translate-y-1/2 rounded-bl-[10px] rounded-br-[10px]">
             ⬅️ Start uploading files
             </div>
         </div>}
