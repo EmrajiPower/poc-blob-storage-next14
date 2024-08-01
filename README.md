@@ -18,6 +18,7 @@ npm run dev
 ## Features in-progress
 
 - [x] CRUD API request: UPDATE (Pencil Icon functionality)
+- [x] Add UI or failsafe handler when a server error occurs
 
 ### If you want to execute in your machine:
 In you are looking for test the Vercel blob feature in your own clone repository follow these steps:
