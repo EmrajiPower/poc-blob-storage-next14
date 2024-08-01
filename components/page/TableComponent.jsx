@@ -99,7 +99,7 @@ function TableComponent({onUpload}) {
                         <TableRow>
                             <TableHead className="w-[100px]">Name</TableHead>
                             <TableHead>size</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
+                            <TableHead className="text-left">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody className={`h-[20vh] max-h-[30vh] overflow-y-auto overflow-x-auto ${loading || progress && "blur-md"}`}>
