@@ -7,13 +7,16 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { DownloadIcon, DeleteIcon } from '@/components/utils/icons';
+import { DownloadIcon, DeleteIcon, LoadingSpinner } from '@/components/utils/icons';
 import { bytesToMegabytes } from "../utils/math";
+import "./index.css"
 
 export default function TableComponent({onUpload}) {
 
     const [file, setFile] = useState(null)
+    // API loading state
     const [loading, setLoading] = useState(true)
+    // Helper for API loading state, it's for improve the behaviour when page is loaded and avoid showing other UI elements
     const [progress, setProgress] = useState(false)
 
     const getBlobs = async () => {
@@ -39,7 +42,10 @@ export default function TableComponent({onUpload}) {
     }, [])
 
     useEffect(() => {
-        getBlobs()
+        // It's an incremental backoff simulation, in case of requesting too fast
+        setTimeout(()=>{
+            getBlobs()
+        },100)
     }, [onUpload])
 
     const onDelete = async (data) => {
@@ -71,6 +77,11 @@ export default function TableComponent({onUpload}) {
             }
             {/* Fetched data */}
             {file !== null && file.length !== 0 &&
+            <div className="flex relative">
+                        {loading || progress && <div
+  class="absolute z-[2] left-[45%] top-1/2 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current blur-none border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+  role="status">
+  </div>}
                 <Table className="bg-white rounded-xl h-[50vh] w-[35vw]">
                     <TableHeader>
                         <TableRow>
@@ -79,7 +90,7 @@ export default function TableComponent({onUpload}) {
                             <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
-                    <TableBody className="h-[20vh] max-h-[30vh] overflow-y-auto overflow-x-auto">
+                    <TableBody className={`h-[20vh] max-h-[30vh] overflow-y-auto overflow-x-auto ${loading || progress && "blur-md"}`}>
                         {file && file.map((d,i) => {
                             return <TableRow key={i}>
                                 <TableCell className="font-medium">{d.pathname}</TableCell>
@@ -93,7 +104,7 @@ export default function TableComponent({onUpload}) {
                             </TableRow>
                         })}
                     </TableBody>
-                </Table>}
+                </Table></div>}
             {/* Empty state */}
               {file && file.length == 0 && <div className="relative flex">
             <Table className=" bg-white rounded-xl h-[5vh] w-[30vw]">
