@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import {
     Table,
     TableBody,
@@ -7,16 +7,18 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { DownloadIcon } from '@/components/utils/icons';
+import { DownloadIcon, DeleteIcon } from '@/components/utils/icons';
 import { bytesToMegabytes } from "../utils/math";
 
-export default function TableComponent() {
+export default function TableComponent({onUpload}) {
 
     const [file, setFile] = useState(null)
     const [loading, setLoading] = useState(true)
+    const [progress, setProgress] = useState(false)
 
     const getBlobs = async () => {
         setLoading(true)
+        setProgress(true)
         try {
             const response = await fetch('/api/file');
             const data = await response.json();
@@ -28,16 +30,32 @@ export default function TableComponent() {
             setFile([])
         }
         setLoading(false)
+        setProgress(false)
     }
+
+    useLayoutEffect(() => {
+        setProgress(false)
+        getBlobs()
+    }, [])
 
     useEffect(() => {
         getBlobs()
-    }, [])
+    }, [onUpload])
+
+    const onDelete = async (data) => {
+        setProgress(true)
+        await fetch(`/api/file?url=${data.url}`, {
+            method: "DELETE",
+            body: data,
+          });
+        await getBlobs()
+        setProgress(false)
+    }
 
     return (
         <>
             {/* Loading state */}
-            {loading&&
+            {loading && !progress &&
                 <div className="bg-gray-200 animate-pulse rounded-xl h-[50vh] w-[40vw]">
                     <div className="w-full flex">
                         <div className="w-[100px] h-6"></div>
@@ -62,11 +80,16 @@ export default function TableComponent() {
                         </TableRow>
                     </TableHeader>
                     <TableBody className="h-[20vh] max-h-[30vh] overflow-y-auto overflow-x-auto">
-                        {file && file.map(({downloadUrl,pathname,size},i) => {
+                        {file && file.map((d,i) => {
                             return <TableRow key={i}>
-                                <TableCell className="font-medium">{pathname}</TableCell>
-                                <TableCell>{bytesToMegabytes(size)}</TableCell>
-                                <TableCell className="text-right"><a href={`${downloadUrl}`}><DownloadIcon/></a></TableCell>
+                                <TableCell className="font-medium">{d.pathname}</TableCell>
+                                <TableCell>{bytesToMegabytes(d.size)}</TableCell>
+                                <TableCell className="text-right">
+                                    <section className="flex flex-row">
+                                        <a href={`${d.downloadUrl}`}><DownloadIcon/></a>
+                                        <p onClick={()=>onDelete(d)} ><DeleteIcon/></p>
+                                    </section>
+                                    </TableCell>
                             </TableRow>
                         })}
                     </TableBody>

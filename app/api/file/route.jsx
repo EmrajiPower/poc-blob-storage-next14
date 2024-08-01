@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"; 
-import { list } from '@vercel/blob';
-import { put } from "@vercel/blob";
+import { list, put, del } from '@vercel/blob';
 
 export async function POST(req) {
     const { searchParams } = new URL(req.url);
@@ -18,4 +17,12 @@ export async function POST(req) {
 export async function GET() {
     const { blobs } = await list();
     return Response.json({ blobs });
+}
+ 
+export async function DELETE(request) {
+  const { searchParams } = new URL(request.url);
+  const urlToDelete = searchParams.get('url');
+  await del(urlToDelete);
+ 
+  return new Response();
 }

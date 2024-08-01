@@ -1,5 +1,5 @@
 "use client"
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import packageJson from '../package.json'
 import TableComponent from '@/components/page/TableComponent';
 import { UploadIcon } from '@/components/utils/icons';
@@ -7,11 +7,12 @@ import { UploadIcon } from '@/components/utils/icons';
 export default function Home() {
 
   const fileRef = useRef(null)
+  const [submit,onSubmit] =useState(false)
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    onSubmit(false)
     if (!fileRef.current?.files) {
       throw new Error("No file selected");
     }
@@ -23,6 +24,7 @@ export default function Home() {
         method: "POST",
         body: file,
       });
+      onSubmit(true)
     }
   }
 
@@ -43,7 +45,7 @@ export default function Home() {
           </div>
         </section>
         <section>
-          <TableComponent />
+          <TableComponent onUpload={submit} />
         </section>
       </div>
     </main>
