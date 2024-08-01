@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState, memo } from "react";
 import {
     Table,
     TableBody,
@@ -7,13 +7,16 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { DownloadIcon, DeleteIcon, LoadingSpinner } from '@/components/utils/icons';
+import { DownloadIcon, DeleteIcon } from '@/components/utils/icons';
 import { bytesToMegabytes } from "../utils/math";
-import "./index.css"
+import { STORE_BLOBS } from "@/app/reducers/types";
+import { useAppContext } from "@/app/provider";
 
-export default function TableComponent({onUpload}) {
+function TableComponent({onUpload}) {
 
-    const [file, setFile] = useState(null)
+    //Global/persist state
+    const { state, dispatch } = useAppContext();
+
     // API loading state
     const [loading, setLoading] = useState(true)
     // Helper for API loading state, it's for improve the behaviour when page is loaded and avoid showing other UI elements
@@ -26,11 +29,13 @@ export default function TableComponent({onUpload}) {
             const response = await fetch('/api/file');
             const data = await response.json();
             if(data){
-                setFile(data.blobs)
+                await dispatch({
+                    type: STORE_BLOBS,
+                    payload: data.blobs,
+                });
             }
         } catch (error) {
-            console.log("Tenemos :: ",error)
-            setFile([])
+            console.log("[Error] fetching blobs ",error)
         }
         setLoading(false)
         setProgress(false)
@@ -47,6 +52,13 @@ export default function TableComponent({onUpload}) {
             getBlobs()
         },100)
     }, [onUpload])
+
+        //Se actualiza ele estado global del componente cada vez que ve el usuario realiza un voto
+    useEffect(() => {
+        if (state?.blobs) {
+            console.log("[Success] Blobs info ",state.blobs)
+        }
+    }, [state.blobs]);
 
     const onDelete = async (data) => {
         setProgress(true)
@@ -76,7 +88,7 @@ export default function TableComponent({onUpload}) {
               </div>
             }
             {/* Fetched data */}
-            {file !== null && file.length !== 0 &&
+            {state?.blobs !== null && state.blobs.length !== 0 &&
             <div className="flex relative">
                         {loading || progress && <div
   class="absolute z-[2] left-[45%] top-1/2 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current blur-none border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
@@ -91,7 +103,7 @@ export default function TableComponent({onUpload}) {
                         </TableRow>
                     </TableHeader>
                     <TableBody className={`h-[20vh] max-h-[30vh] overflow-y-auto overflow-x-auto ${loading || progress && "blur-md"}`}>
-                        {file && file.map((d,i) => {
+                        {state.blobs && state.blobs.map((d,i) => {
                             return <TableRow key={i}>
                                 <TableCell className="font-medium">{d.pathname}</TableCell>
                                 <TableCell>{bytesToMegabytes(d.size)}</TableCell>
@@ -106,7 +118,7 @@ export default function TableComponent({onUpload}) {
                     </TableBody>
                 </Table></div>}
             {/* Empty state */}
-              {file && file.length == 0 && <div className="relative flex">
+              {state?.blobs && state.blobs.length == 0 && <div className="relative flex">
             <Table className=" bg-white rounded-xl h-[5vh] w-[30vw]">
                 <TableHeader>
                     <TableRow className="h-[20px]">
@@ -124,3 +136,5 @@ export default function TableComponent({onUpload}) {
 
     )
 }
+
+export default memo(TableComponent)

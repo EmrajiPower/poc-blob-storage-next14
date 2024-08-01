@@ -3,8 +3,9 @@ import { useRef, useState } from 'react';
 import packageJson from '../package.json'
 import TableComponent from '@/components/page/TableComponent';
 import { UploadIcon } from '@/components/utils/icons';
+import { ContextProvider } from './provider';
 
-export default function Home() {
+function App() {
 
   const fileRef = useRef(null)
   const [submit,onSubmit] =useState(false)
@@ -54,3 +55,14 @@ export default function Home() {
     </main>
   );
 }
+
+function Home() {
+  return (
+    <ContextProvider>
+      <App />;
+    </ContextProvider>
+  );
+}
+
+export default Home;
+
